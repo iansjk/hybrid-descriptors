@@ -83,7 +83,7 @@ public class ReadDescriptors {
                 String descriptorString = "";
                 Scanner tok = new Scanner(line);
                 tok.useDelimiter(",");
-                tok.next(); // skip compound identifier
+                String compoundName = tok.next(); // skip compound identifier
                 String tmp = tok.next();
                 tok.close();
                 tok = new Scanner(tmp);
@@ -104,6 +104,7 @@ public class ReadDescriptors {
                 }
                 Descriptors di = new Descriptors();
                 di.setDescriptorValues(descriptorString);
+                di.setCompoundName(compoundName);
                 descriptorValueMatrix.add(di);
 
             }
@@ -127,12 +128,13 @@ public class ReadDescriptors {
             while (tok.hasNext()) {
                 descriptorNames.add(tok.next());
             }
+            String compoundName = null;
             while ((line = br.readLine()) != null) {
                 tok = new Scanner(line);
                 tok.useDelimiter(",");
                 if (tok.hasNext()) {
                 /* first descriptor value is the name of the compound */
-                    tok.next();
+                    compoundName = tok.next();
                 }
                 String descriptorString = "";
                 while (tok.hasNext()) {
@@ -151,6 +153,7 @@ public class ReadDescriptors {
                 if (!descriptorString.equalsIgnoreCase("")) {
                     Descriptors di = new Descriptors();
                     di.setDescriptorValues(descriptorString);
+                    di.setCompoundName(compoundName);
                     descriptorValueMatrix.add(di);
                 }
                 tok.close();
@@ -169,12 +172,13 @@ public class ReadDescriptors {
             while (tok.hasNext()) {
                 descriptorNames.add(tok.next());
             }
+            String compoundName = null;
             while ((line = br.readLine()) != null) {
                 tok = new Scanner(line);
                 tok.useDelimiter(" ");
                 if (tok.hasNext()) {
                 /* first descriptor value is the name of the compound */
-                    tok.next();
+                    compoundName = tok.next();
                 }
                 String descriptorString = "";
                 while (tok.hasNext()) {
@@ -183,6 +187,7 @@ public class ReadDescriptors {
                 }
                 if (!descriptorString.equalsIgnoreCase("")) {
                     Descriptors di = new Descriptors();
+                    di.setCompoundName(compoundName);
                     di.setDescriptorValues(descriptorString);
                     descriptorValueMatrix.add(di);
                 }
