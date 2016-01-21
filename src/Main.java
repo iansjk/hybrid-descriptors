@@ -21,6 +21,10 @@ public class Main {
         Path exampleDir = Paths.get("examples").toAbsolutePath();
         String sdfName = "aa_48_2.sdf";
         DescriptorSet cdk = ReadDescriptors.read(exampleDir.resolve(sdfName + ".cdk.x"));
+        DescriptorSet dragonH = ReadDescriptors.read(exampleDir.resolve(sdfName + ".dragonH"));
+        DescriptorSet dragonNoH = ReadDescriptors.read(exampleDir.resolve(sdfName + ".dragonNoH"));
+        DescriptorSet ISIDA = ReadDescriptors.read(exampleDir.resolve(sdfName + ".ISIDA"));
+        DescriptorSet maccs = ReadDescriptors.read(exampleDir.resolve(sdfName + ".maccs"));
         DescriptorSet moe2d = ReadDescriptors.read(exampleDir.resolve(sdfName + ".moe2D"));
 
         // compoundName -> [(descriptor1Name, descriptor1Value), ...]
