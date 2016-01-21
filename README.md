@@ -10,4 +10,17 @@
 
 ### Provided resources
 - The `ReadDescriptors#read` method will take a Java `Path` and return a `DescriptorSet` object for any descriptor set type
+    - `DescriptorSet.descriptorType` is the descriptor set type (see the `DescriptorType` enum for list of values)
+    - `DescriptorSet.matrix` is a `Map<String, Map<String, Double>>` object representing the descriptor matrix
+        - The outer map is a mapping of compound names to the inner map
+        - The inner map is a mapping of descriptor names to descriptor values
+
 - The `examples/` directory contains the descriptor set files for the `Anticonvulsants 48` dataset
+
+### Tips
+- The Guava library (included in `lib/`) will be helpful for writing the `.x` file
+    - Consider using the `Joiner` class when writing fields:
+    ```
+    Joiner joiner = Joiner.on('\t');
+    joiner.join(Lists.newArrayList(3, 5, 7)); # produces "3\t5\t7"
+    ```
