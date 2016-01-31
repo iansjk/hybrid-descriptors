@@ -279,21 +279,27 @@ public class ReadDescriptors {
             throw new RuntimeException("Descriptor reading failed", e);
         }
 
-        Map<String, Map<String, Double>> matrix = Maps.newTreeMap();
-        Splitter splitter = Splitter.on(CharMatcher.WHITESPACE);
+        Map<String, List<Double>> matrix = Maps.newTreeMap();
+        Splitter splitter = Splitter.on(CharMatcher.WHITESPACE).omitEmptyStrings();
         for (Descriptors d : descriptorValueMatrix) {
             String compoundName = d.getCompoundName();
             List<String> rawValues = splitter.splitToList(d.getDescriptorValues());
-            Map<String, Double> values = Maps.newTreeMap();
-            for (int i = 0; i < rawValues.size() && i < descriptorNames.size(); i++) {
-                values.put(descriptorNames.get(i), Double.parseDouble(rawValues.get(i)));
+            List<Double> values = Lists.newArrayListWithExpectedSize(rawValues.size());
+            for (String rawValue : rawValues) {
+                try {
+                    values.add(Double.parseDouble(rawValue));
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("Encountered non-double descriptor value", e);
+                }
             }
+            assert values.size() == descriptorNames.size();
             matrix.put(compoundName, values);
         }
 
         DescriptorSet ds = new DescriptorSet();
         ds.setDescriptorType(infileType);
         ds.setMatrix(matrix);
+        ds.setDescriptorNames(descriptorNames);
         return ds;
     }
 }

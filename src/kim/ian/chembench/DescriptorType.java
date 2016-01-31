@@ -6,7 +6,8 @@ public enum DescriptorType {
     DragonNoH(".dragonNoH"),
     MACCS(".maccs"),
     MOE2D(".moe2D"),
-    ISIDA(".ISIDA");
+    ISIDA(".ISIDA"),
+    HYBRID("");
 
     private final String extension;
 

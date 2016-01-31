@@ -11,4 +11,5 @@
 *.ISIDA.hdr
 *.ISIDA.svm
 *.cdk
+*.hybrid
 

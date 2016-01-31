@@ -11,10 +11,10 @@
 ### Provided resources
 - The `ReadDescriptors#read` method will take a Java `Path` and return a `DescriptorSet` object for any descriptor set type
     - `DescriptorSet.descriptorType` is the descriptor set type (see the `DescriptorType` enum for list of values)
-    - `DescriptorSet.matrix` is a `Map<String, Map<String, Double>>` object representing the descriptor matrix
-        - The outer map is a mapping of compound names to the inner map
-        - The inner map is a mapping of descriptor names to descriptor values
-
+    - `DescriptorSet.descriptorNames` is a `List` of descriptor names (column headers), left to right
+    - `DescriptorSet.matrix` is a `Map<String, List<Double>>` object representing the descriptor matrix
+        - The keys are compound names, and
+        - The values are `List`s of descriptor values. These are guaranteed to be in the same order as `descriptorNames`.
 - The `examples/` directory contains the descriptor set files for the `Anticonvulsants 48` dataset
 
 ### Tips
