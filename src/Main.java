@@ -1,19 +1,19 @@
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import kim.ian.chembench.DescriptorSet;
-import kim.ian.chembench.DescriptorType;
-import kim.ian.chembench.ReadDescriptors;
+        import com.google.common.collect.Lists;
+        import com.google.common.collect.Maps;
+        import kim.ian.chembench.DescriptorSet;
+        import kim.ian.chembench.DescriptorType;
+        import kim.ian.chembench.ReadDescriptors;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+        import java.io.BufferedWriter;
+        import java.io.IOException;
+        import java.nio.charset.StandardCharsets;
+        import java.nio.file.Files;
+        import java.nio.file.Path;
+        import java.nio.file.Paths;
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.Map;
 
 public class Main {
     /**
@@ -56,25 +56,11 @@ public class Main {
         DescriptorSet maccs = ReadDescriptors.read(exampleDir.resolve(sdfName + ".maccs"));
         DescriptorSet moe2d = ReadDescriptors.read(exampleDir.resolve(sdfName + ".moe2D"));
 
-        // compoundName -> [descriptor1, descriptor2, ...
 
-        // join the descriptor names lists together, appending the descriptor type to each descriptor name
-        List<String> hybridDescriptorNames = combineName(cdk, "CDK", moe2d, "MOE2D");
-
-        // TODO your code goes here
-
-        // take cdkMatrix and moe2dMatrix and combine them
-
-        Map<String, List<Double>> hybridMatrix = combine_matrix(cdk, moe2d);
-
-//        // write out the result to an X file
-        DescriptorSet hybridDescriptors = new DescriptorSet();
-        hybridDescriptors.setDescriptorType(DescriptorType.HYBRID);
-        hybridDescriptors.setDescriptorNames(hybridDescriptorNames);
-        hybridDescriptors.setMatrix(hybridMatrix);
+        DescriptorSet hybridDescriptors = createHybrid(cdk, moe2d, maccs, dragonH, dragonNoH, ISIDA);
 
         List<String> filenameParts = Lists.newArrayList(sdfName);
-        for (DescriptorSet ds : new DescriptorSet[]{cdk, moe2d, hybridDescriptors}) {
+        for (DescriptorSet ds : new DescriptorSet[]{cdk, moe2d, maccs, dragonH, dragonNoH, ISIDA, hybridDescriptors}) {
             filenameParts.add(ds.getDescriptorType().toString().toLowerCase());
         }
 
@@ -85,38 +71,54 @@ public class Main {
     private static String rename(String type, String name){
         return (type + "_" + name);
     }
-    private static List<String> combineName(DescriptorSet one, String attach_one, DescriptorSet two, String attach_two) {
+    private static List<String> combineName(DescriptorSet...descriptors) {
         List<String> hybridDesNames = Lists.newArrayList();
-        for (int i =0;i<one.getDescriptorNames().size();i++){
-            hybridDesNames.add(rename(attach_one, one.getDescriptorNames().get(i)));
-        }
-        for (int j =0;j<two.getDescriptorNames().size();j++){
-            hybridDesNames.add(rename(attach_two, two.getDescriptorNames().get(j)));
+        for (DescriptorSet descriptor: descriptors){
+            for (String descriptorName: descriptor.getDescriptorNames()) {
+                hybridDesNames.add(rename(descriptor.getDescriptorType().toString(), descriptorName));
+            }
         }
         return hybridDesNames;
     }
-    private static Map<String, List<Double>>  combine_matrix (DescriptorSet ones, DescriptorSet twos){
-        Map<String, List<Double>> one= ones.getMatrix();
-        Map<String, List<Double>> two = twos.getMatrix();
+    private static DescriptorSet createHybrid (DescriptorSet...descriptors){
+        DescriptorSet hybridDescriptors = new DescriptorSet();
+        hybridDescriptors.setDescriptorType(DescriptorType.HYBRID);
+        hybridDescriptors.setDescriptorNames(combineName(descriptors));
+        hybridDescriptors.setMatrix(combineMatrix(descriptors));
+        return hybridDescriptors;
+    }
+    private static Map<String, List<Double>>  combineMatrix (DescriptorSet...descriptors) {
         Map<String, List<Double>> hybrid = Maps.newTreeMap();
-        // TODO your code goes here
-        for (String compoundName : one.keySet()) {
-            List<Double> values = one.get(compoundName);
-            hybrid.put(compoundName, values);
-        }
-        for (String compoundName :two.keySet()) {
-            if (hybrid.containsKey(compoundName)){
-                List<Double> newValues= new ArrayList<Double>();
-                List<Double> values = two.get(compoundName);
-                newValues.addAll(hybrid.get(compoundName));
-                newValues.addAll(values);
 
-                hybrid.put(compoundName, newValues);
-            }
-            else{
-                throw new RuntimeException("Non-match keys");
-            }
+        hybrid = combineMatrixs(descriptors[0].getMatrix(), descriptors[1].getMatrix());
+        if(descriptors.length >=2){
+        for (int i = 2 ; i < descriptors.length; i++) {
+            hybrid = combineMatrixs(hybrid, descriptors[i].getMatrix());
+        }
         }
         return hybrid;
     }
-}
+        private static Map<String, List<Double>>  combineMatrixs( Map<String, List<Double>> one,  Map<String, List<Double>> two){
+
+            Map<String, List<Double>> hybrid = Maps.newTreeMap();
+            // TODO your code goes here
+            for (String compoundName : one.keySet()) {
+                List<Double> values = one.get(compoundName);
+                hybrid.put(compoundName, values);
+            }
+            for (String compoundName :two.keySet()) {
+                if (hybrid.containsKey(compoundName)){
+                    List<Double> newValues= new ArrayList<Double>();
+                    List<Double> values = two.get(compoundName);
+                    newValues.addAll(hybrid.get(compoundName));
+                    newValues.addAll(values);
+
+                    hybrid.put(compoundName, newValues);
+                }
+                else{
+                    throw new RuntimeException("Non-match keys");
+                }
+            }
+            return hybrid;
+        }
+    }
